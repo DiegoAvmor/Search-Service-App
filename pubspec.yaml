@@ -30,6 +30,8 @@ dependencies:
   cupertino_icons: ^1.0.0
   flutter_search_bar: ^2.1.0
   intl: ^0.16.1
+  provider: ^3.0.0
+  rxdart: ^0.25.0
 
 dev_dependencies:
   flutter_test:
