@@ -5,7 +5,11 @@ import 'validators/search_validator.dart';
 
 class SearchBloc with SearchValidator {
   final _serviceController = BehaviorSubject<List<SearchService>>();
+  final _dateController = BehaviorSubject<DateTime>();
   final _checkboxController = BehaviorSubject<Map<int, bool>>();
+
+  Stream<DateTime> get date => _dateController.stream.transform(validateDate);
+  Function(DateTime) get changeDate => _dateController.sink.add;
 
   Stream<Map<int, bool>> get mapModelCheckbox => _checkboxController.stream;
   Function(Map<int, bool>) get setCheckbox => _checkboxController.sink.add;
@@ -18,6 +22,7 @@ class SearchBloc with SearchValidator {
 
   dipose() {
     _serviceController.close();
+    _dateController.close();
     _checkboxController.close();
   }
 }
