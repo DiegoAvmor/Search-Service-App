@@ -11,9 +11,9 @@ class _HomeState extends State<HomeScreen> {
   DateTime selectedDate;
 
   Map<String, bool> checkBoxList = {
-    'place': false,
-    'food': false,
-    'music': false
+    'Place': false,
+    'Food': false,
+    'Music': false
   };
 
   @override
@@ -24,7 +24,9 @@ class _HomeState extends State<HomeScreen> {
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.search),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/search');
+            },
           )
         ],
       ),
@@ -80,42 +82,42 @@ class _HomeState extends State<HomeScreen> {
             CheckboxListTile(
               title: Text('Place'),
               controlAffinity: ListTileControlAffinity.leading,
-              value: checkBoxList['place'],
+              value: checkBoxList['Place'],
               secondary: Icon(
                 Icons.place,
                 size: 35,
               ),
               onChanged: (bool value) {
                 setState(() {
-                  checkBoxList['place'] = value;
+                  checkBoxList['Place'] = value;
                 });
               },
             ),
             CheckboxListTile(
               title: Text('Food'),
               controlAffinity: ListTileControlAffinity.leading,
-              value: checkBoxList['food'],
+              value: checkBoxList['Food'],
               secondary: Icon(
                 Icons.food_bank,
                 size: 35,
               ),
               onChanged: (bool value) {
                 setState(() {
-                  checkBoxList['food'] = value;
+                  checkBoxList['Food'] = value;
                 });
               },
             ),
             CheckboxListTile(
               title: Text('Music'),
               controlAffinity: ListTileControlAffinity.leading,
-              value: checkBoxList['music'],
+              value: checkBoxList['Music'],
               secondary: Icon(
                 Icons.library_music,
                 size: 35,
               ),
               onChanged: (bool value) {
                 setState(() {
-                  checkBoxList['music'] = value;
+                  checkBoxList['Music'] = value;
                 });
               },
             )
