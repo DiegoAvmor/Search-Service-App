@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:service_search_app/bloc/search_bloc.dart';
-import 'package:service_search_app/services/impl/food_service.dart';
-import 'package:service_search_app/services/impl/music_service.dart';
-import 'package:service_search_app/services/impl/place_service.dart';
+import 'package:service_search_app/models/service_item.dart';
+import 'package:service_search_app/providers/service_provider.dart';
 import 'package:service_search_app/services/search_service.dart';
 import 'dart:developer' as developer;
 
@@ -15,28 +14,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeState extends State<HomeScreen> {
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
-  DateTime selectedDate;
+  final ServiceProvider provider = new ServiceProvider();
 
-  List<SearchService> services = [];
-
-  Map<String, bool> checkBoxList = {
-    'Place': false,
-    'Food': false,
-    'Music': false
-  };
-
-  List<SearchService> _addService(SearchService service) {
-    services.add(service);
-    return services;
-  }
-
-  List<SearchService> _removeService(SearchService oldService) {
-    services.removeWhere((service) => service == oldService);
-    return services;
+  StreamBuilder buildCheckBox(SearchBloc bloc, ServiceItem service, int index) {
+    return StreamBuilder(
+      stream: bloc.mapModelCheckbox,
+      builder: (context, snapshot) {
+        return CheckboxListTile(
+          title: Text(service.name),
+          controlAffinity: ListTileControlAffinity.leading,
+          value: snapshot.hasData,
+          onChanged: (bool value) {},
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final serviceItems = provider.getServiceItems();
     final bloc = Provider.of<SearchBloc>(context);
     return Scaffold(
       appBar: AppBar(
@@ -74,31 +70,35 @@ class _HomeState extends State<HomeScreen> {
                 ),
               ],
             ),
-            ListTile(
-              leading: Icon(
-                Icons.calendar_today_sharp,
-                color: Colors.red,
-                size: 30,
-              ),
-              title: Text("Event Date"),
-              subtitle: Text(selectedDate == null
-                  ? "No date selected"
-                  : formatter.format(selectedDate)),
-              onTap: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(
-                    new Duration(days: 600),
+            StreamBuilder(
+              stream: bloc.date,
+              builder: (context, snapshot) {
+                return ListTile(
+                  leading: Icon(
+                    Icons.calendar_today_sharp,
+                    color: Colors.red,
+                    size: 30,
                   ),
-                ).then((newdate) {
-                  setState(() {
-                    selectedDate = newdate;
-                  });
-                });
+                  title: Text("Event Date"),
+                  subtitle: Text(snapshot.hasData
+                      ? formatter.format(snapshot.data)
+                      : 'No date Selected'),
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(
+                        new Duration(days: 600),
+                      ),
+                    ).then(bloc.changeDate);
+                  },
+                );
               },
             ),
+            for (var i = 0; i < serviceItems.length; i++)
+              buildCheckBox(bloc, serviceItems.elementAt(i), i)
+            /*
             StreamBuilder(
               stream: bloc.service,
               builder: (context, snapshot) {
@@ -161,7 +161,7 @@ class _HomeState extends State<HomeScreen> {
                   ],
                 );
               },
-            ),
+            ),*/
           ],
         ),
       ),
