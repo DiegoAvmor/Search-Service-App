@@ -16,21 +16,6 @@ class SearchBloc with SearchValidator {
   Function(List<SearchService>) get changeServices =>
       _serviceController.sink.add;
 
-/*
-  Stream<String> get email => _emailController.stream.transform(validateEmail);
-  Stream<String> get password =>
-      _passwordController.stream.transform(validatePassword);
-  Stream<bool> get submit =>
-      CombineLatestStream.combine2(email, password, (a, b) => true);
-
-  Function(String) get changeEmail => _emailController.sink.add;
-  Function(String) get changePassword => _passwordController.sink.add;
-
-  submitValues() {
-    final validEmail = _emailController.value;
-    final validPassword = _passwordController.value;
-    print("Email: $validateEmail Password: $validatePassword");
-  }*/
   dipose() {
     _serviceController.close();
     _checkboxController.close();

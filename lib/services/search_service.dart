@@ -6,4 +6,6 @@ abstract class SearchService {
   ItemRepository get itemRepository => this._itemRepository;
 
   List<SearchResult> searchItem(String input);
+
+  String getName();
 }
