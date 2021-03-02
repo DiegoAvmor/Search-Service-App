@@ -3,6 +3,7 @@ import 'package:service_search_app/models/search_result.dart';
 import 'package:service_search_app/services/search_service.dart';
 
 class FoodService extends SearchService {
+  final String _name = 'Food';
   static final FoodService _inst = FoodService._internal();
 
   FoodService._internal();
@@ -21,5 +22,10 @@ class FoodService extends SearchService {
       developer.log(e.toString());
       return results;
     }
+  }
+
+  @override
+  String getName() {
+    return this._name;
   }
 }
