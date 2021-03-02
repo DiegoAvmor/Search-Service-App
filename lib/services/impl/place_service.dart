@@ -3,6 +3,14 @@ import 'package:service_search_app/models/search_result.dart';
 import 'package:service_search_app/services/search_service.dart';
 
 class PlaceService extends SearchService {
+  static final PlaceService _inst = PlaceService._internal();
+
+  PlaceService._internal();
+
+  factory PlaceService() {
+    return _inst;
+  }
+
   @override
   List<SearchResult> searchItem(String input) {
     // TODO: implement searchItem

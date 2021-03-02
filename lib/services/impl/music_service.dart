@@ -3,6 +3,13 @@ import 'package:service_search_app/models/search_result.dart';
 import 'package:service_search_app/services/search_service.dart';
 
 class MusicService extends SearchService {
+  static final MusicService _inst = MusicService._internal();
+
+  MusicService._internal();
+
+  factory MusicService() {
+    return _inst;
+  }
   @override
   List<SearchResult> searchItem(String input) {
     // TODO: implement searchItem
