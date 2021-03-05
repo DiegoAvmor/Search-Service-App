@@ -6,7 +6,7 @@ abstract class SearchService {
   ItemRepository _itemRepository = new ItemRepository();
   ItemRepository get itemRepository => this._itemRepository;
 
-  List<SearchResult> searchItem(String input);
+  Future<List<SearchResult>> searchItem(String input);
 
   String getName();
   Icon getIcon();

@@ -17,7 +17,7 @@ class MusicService extends SearchService {
     return _inst;
   }
   @override
-  List<SearchResult> searchItem(String input) {
+  Future<List<SearchResult>> searchItem(String input) async {
     // TODO: implement searchItem
     List<SearchResult> results = [];
     try {
