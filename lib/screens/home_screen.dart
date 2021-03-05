@@ -2,42 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:service_search_app/bloc/search_bloc.dart';
-import 'package:service_search_app/services/impl/food_service.dart';
-import 'package:service_search_app/services/impl/music_service.dart';
-import 'package:service_search_app/services/impl/place_service.dart';
-import 'package:service_search_app/services/search_service.dart';
-import 'dart:developer' as developer;
+import 'package:service_search_app/models/service_item.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
-
-class _HomeState extends State<HomeScreen> {
+class HomeScreen extends StatelessWidget {
   final DateFormat formatter = DateFormat('yyyy-MM-dd');
-  DateTime selectedDate;
 
-  List<SearchService> services = [];
-
-  Map<String, bool> checkBoxList = {
-    'Place': false,
-    'Food': false,
-    'Music': false
-  };
-
-  List<SearchService> _addService(SearchService service) {
-    services.add(service);
-    return services;
-  }
-
-  List<SearchService> _removeService(SearchService oldService) {
-    services.removeWhere((service) => service == oldService);
-    return services;
+  StreamBuilder buildCheckBox(SearchBloc bloc, ServiceItem service, int index) {
+    return StreamBuilder(
+      stream: bloc.mapModelCheckbox,
+      builder: (context, snapshot) {
+        return CheckboxListTile(
+          title: Text(bloc.mapServiceCollection[index].name),
+          secondary: bloc.mapServiceCollection[index].icon,
+          controlAffinity: ListTileControlAffinity.leading,
+          value: bloc.mapCheckboxCollection[index],
+          onChanged: (bool value) =>
+              bloc.setCheckbox(<int, bool>{index: value}),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<SearchBloc>(context);
+    final serviceItems = bloc.currentServices;
     return Scaffold(
       appBar: AppBar(
         title: Text('Main'),
@@ -74,94 +63,34 @@ class _HomeState extends State<HomeScreen> {
                 ),
               ],
             ),
-            ListTile(
-              leading: Icon(
-                Icons.calendar_today_sharp,
-                color: Colors.red,
-                size: 30,
-              ),
-              title: Text("Event Date"),
-              subtitle: Text(selectedDate == null
-                  ? "No date selected"
-                  : formatter.format(selectedDate)),
-              onTap: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(
-                    new Duration(days: 600),
-                  ),
-                ).then((newdate) {
-                  setState(() {
-                    selectedDate = newdate;
-                  });
-                });
-              },
-            ),
             StreamBuilder(
-              stream: bloc.service,
+              stream: bloc.date,
               builder: (context, snapshot) {
-                return Column(
-                  children: [
-                    CheckboxListTile(
-                      title: Text('Place'),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      value: checkBoxList['Place'],
-                      secondary: Icon(
-                        Icons.place,
-                        size: 35,
+                return ListTile(
+                  leading: Icon(
+                    Icons.calendar_today_sharp,
+                    color: Colors.red,
+                    size: 30,
+                  ),
+                  title: Text("Event Date"),
+                  subtitle: Text(snapshot.hasData
+                      ? formatter.format(snapshot.data)
+                      : 'No date Selected'),
+                  onTap: () {
+                    showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(
+                        new Duration(days: 600),
                       ),
-                      onChanged: (bool value) {
-                        setState(() {
-                          checkBoxList['Place'] = value;
-                          services = value
-                              ? _addService(PlaceService())
-                              : _removeService(PlaceService());
-                          bloc.changeServices(services);
-                        });
-                      },
-                    ),
-                    CheckboxListTile(
-                      title: Text('Food'),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      value: checkBoxList['Food'],
-                      secondary: Icon(
-                        Icons.food_bank,
-                        size: 35,
-                      ),
-                      onChanged: (bool value) {
-                        setState(() {
-                          checkBoxList['Food'] = value;
-                          services = value
-                              ? _addService(FoodService())
-                              : _removeService(FoodService());
-                          bloc.changeServices(services);
-                        });
-                      },
-                    ),
-                    CheckboxListTile(
-                      title: Text('Music'),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      value: checkBoxList['Music'],
-                      secondary: Icon(
-                        Icons.library_music,
-                        size: 35,
-                      ),
-                      onChanged: (bool value) {
-                        setState(() {
-                          checkBoxList['Music'] = value;
-                          services = value
-                              ? _addService(MusicService())
-                              : _removeService(MusicService());
-                          bloc.changeServices(services);
-                        });
-                      },
-                    )
-                  ],
+                    ).then(bloc.changeDate);
+                  },
                 );
               },
             ),
+            for (var i = 0; i < serviceItems.length; i++)
+              buildCheckBox(bloc, serviceItems[i], i)
           ],
         ),
       ),
