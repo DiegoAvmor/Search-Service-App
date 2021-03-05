@@ -17,10 +17,7 @@ class ServiceProvider {
     for (var i = 0; i < services.length; i++) {
       items.add(
         ServiceItem(
-          icon: Icon(
-            Icons.image,
-            size: 35,
-          ),
+          icon: services[i].getIcon(),
           name: services[i].getName(),
           service: services[i],
         ),
