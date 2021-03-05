@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
           title: Text(bloc.mapServiceCollection[index].name),
           secondary: bloc.mapServiceCollection[index].icon,
           controlAffinity: ListTileControlAffinity.leading,
-          value: bloc.mapCheckboxCollection[index],
+          value: bloc.mapServiceCollection[index].selected,
           onChanged: (bool value) =>
               bloc.setCheckbox(<int, bool>{index: value}),
         );

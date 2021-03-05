@@ -12,34 +12,31 @@ class SearchBloc with SearchValidator {
   final ServiceProvider provider = ServiceProvider();
 
   List<ServiceItem> currentServices = [];
-  Map<int, bool> mapCheckboxCollection = HashMap<int, bool>();
   Map<int, ServiceItem> mapServiceCollection = HashMap<int, ServiceItem>();
 
   SearchBloc() {
     currentServices = provider.getServiceItems();
     for (var i = 0; i < currentServices.length; i++) {
       mapServiceCollection[i] = currentServices[i];
-      mapCheckboxCollection[i] = false;
     }
     // Insert initial data in controller
-    _checkboxController.add(mapCheckboxCollection);
-    _checkboxController.stream.listen(setCheckboxHandler);
+    _checkboxController.stream.listen(_setCheckboxHandler);
   }
 
-  setCheckboxHandler(Map<int, bool> newMapCheckbox) {
+  _setCheckboxHandler(Map<int, bool> newMapCheckbox) {
     // New checkbox value for the itemModel id
     int id = newMapCheckbox.entries.elementAt(0).key;
     bool check = newMapCheckbox.entries.elementAt(0).value;
-    if (mapCheckboxCollection.containsKey(id)) {
-      mapCheckboxCollection[id] = check;
+    if (mapServiceCollection.containsKey(id)) {
+      mapServiceCollection[id].selected = check;
     }
   }
 
   List<ServiceItem> getSelectedServices() {
     try {
       List<ServiceItem> selectedServices = [];
-      for (var selection in mapCheckboxCollection.entries) {
-        if (selection.value) {
+      for (var selection in mapServiceCollection.entries) {
+        if (selection.value.selected) {
           selectedServices.add(mapServiceCollection[selection.key]);
         }
       }
