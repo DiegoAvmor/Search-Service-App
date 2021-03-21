@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:service_search_app/models/search_result.dart';
+import 'package:service_search_app/providers/Database.dart';
 import 'package:service_search_app/services/search_service.dart';
 
 class PlaceService extends SearchService {
@@ -20,14 +21,11 @@ class PlaceService extends SearchService {
 
   @override
   Future<List<SearchResult>> searchItem(String input) async {
-    // TODO: implement searchItem
-    List<SearchResult> results = [];
     try {
-      results = this.itemRepository.searchPlace(input);
-      return results;
+      return DBProvider.db.getAllPlaceByName(input);
     } catch (e) {
       developer.log(e.toString());
-      return results;
+      return [];
     }
   }
 
