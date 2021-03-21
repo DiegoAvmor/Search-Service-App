@@ -4,9 +4,6 @@ import 'package:service_search_app/bloc/search_bloc.dart';
 import 'package:service_search_app/bloc/service_bloc.dart';
 import 'package:service_search_app/models/search_result.dart';
 import 'package:service_search_app/models/service_item.dart';
-import 'dart:developer' as developer;
-
-import 'package:service_search_app/services/search_service.dart';
 
 class SearchScreen extends StatefulWidget {
   @override
@@ -17,18 +14,48 @@ class _SearchScreenState extends State<SearchScreen> {
   final ServiceBloc serviceBloc = new ServiceBloc();
   bool isSearching = false;
 
-  ListTile createTileFromResult(SearchResult result) {
-    return ListTile(
-      title: Text(result.name),
-    );
+  Color _rankColorSelector(int ranking) {
+    if (ranking <= 5) {
+      return Colors.red;
+    }
+    if (ranking > 5 && ranking <= 7) {
+      return Colors.yellow;
+    }
+    return Colors.green;
   }
 
-  List<ListTile> _genDummys(int amount) {
-    List<ListTile> dummy = [];
-    for (var i = 0; i < amount; i++) {
-      dummy.add(createTileFromResult(new SearchResult(name: "Busqueda #$i")));
-    }
-    return dummy;
+  List<Card> createTileFromResult(List<SearchResult> results, Icon resultIcon) {
+    List<Card> serviceList = [];
+    results.forEach((result) {
+      serviceList.add(
+        Card(
+          child: ListTile(
+            leading: resultIcon,
+            title: Text(result.name),
+            subtitle: Text(result.description),
+            trailing: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _rankColorSelector(result.ranking),
+              ),
+              child: Center(
+                child: Text(
+                  result.ranking.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    });
+    return serviceList;
   }
 
   @override
@@ -70,6 +97,7 @@ class _SearchScreenState extends State<SearchScreen> {
               setState(() {
                 isSearching = !isSearching;
                 serviceBloc.changeSearchStatus(isSearching);
+                serviceBloc.changeInput(null);
               });
             },
           )
@@ -78,7 +106,6 @@ class _SearchScreenState extends State<SearchScreen> {
       body: StreamBuilder(
         stream: serviceBloc.input,
         builder: (context, snapshot) {
-          developer.log(snapshot.data.toString());
           if (snapshot.hasData && serviceBloc.lastSearchFlagStatus) {
             return ListView.builder(
               itemCount: serviceItems.length,
@@ -88,16 +115,28 @@ class _SearchScreenState extends State<SearchScreen> {
                       .service
                       .searchItem(serviceBloc.lastInput),
                   builder: (context, snapshot) {
-                    developer.log(snapshot.data.toString());
-                    if (snapshot.hasData /*&& snapshot.data.length > 0*/) {
-                      return Column(
-                        children: _genDummys(6),
-                      );
-                    } else {
-                      return Container(
-                        alignment: Alignment.center,
-                        child: CircularProgressIndicator(),
-                      );
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return Container(
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(),
+                        );
+                        break;
+                      case ConnectionState.done:
+                        if (snapshot.hasData && snapshot.data.length > 0) {
+                          return Column(
+                            children: createTileFromResult(
+                                snapshot.data, serviceItems[index].icon),
+                          );
+                        } else {
+                          return Container();
+                        }
+                        break;
+                      default:
+                        return Container(
+                          alignment: Alignment.center,
+                          child: CircularProgressIndicator(),
+                        );
                     }
                   },
                 );
@@ -109,12 +148,15 @@ class _SearchScreenState extends State<SearchScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(
-                  Icons.search_rounded,
-                  size: 50,
+                Text(
+                  '╚(•⌂•)╝',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 35,
+                  ),
                 ),
                 Text(
-                  'Realice una busqueda',
+                  'Well, nothing was found.',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
