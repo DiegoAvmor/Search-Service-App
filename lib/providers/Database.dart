@@ -139,8 +139,8 @@ class DBProvider {
       //Insert data to place table
       batch.insert('place', {'id_place': 1, 'id_product': 9});
       batch.insert('place', {'id_place': 2, 'id_product': 10});
-      batch.insert('place', {'id_music': 3, 'id_product': 11});
-      batch.insert('place', {'id_music': 4, 'id_product': 12});
+      batch.insert('place', {'id_place': 3, 'id_product': 11});
+      batch.insert('place', {'id_place': 4, 'id_product': 12});
 
       batch.commit();
     }, version: 2);
